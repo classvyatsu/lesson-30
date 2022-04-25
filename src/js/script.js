@@ -118,69 +118,120 @@ window.addEventListener("DOMContentLoaded", () => {
     },
   });
 
-  //iform send
-  const form = document.querySelector(".form__elements");
+//iform send
 
-  const sendForm = (data) => {
-    return fetch("mail.php", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
+  const form = document.querySelector('.form__elements'),
+        telSelector = form.querySelector('input[type="tel"]'),
+        inputMask = new Inputmask('+7 (999) 999-99-99');
+
+  inputMask.mask(telSelector);
+
+  const validation = new JustValidate('.form__elements');
+
+  validation
+    .addField('#name', [{
+      rule: 'minLength',
+      value: 2,
+      errorMessage: 'Колличество символов меньше 2!',
+    },
+    {
+      rule: 'maxLength',
+      value: 30,
+      errorMessage: 'Колличество символов больше 30!'
+    },
+    {
+      rule: 'required',
+      value: 'true',
+      errorMessage: 'Введите имя!'
+    }
+    ])
+
+    .addField('#check', [{
+      rule: 'required',
+      value: 'true',
+      errorMessage: 'Подтвердите согласие на обработку личных данных!'
+    }
+    ])
+
+    .addField('#telephone', [{
+      rule: 'required',
+      value: 'true',
+      errorMessage: 'Введите номер телефона!'
+    },
+    {
+      rule: 'function',
+      validator: function () {
+        const phone = telSelector.inputmask.unmaskedvalue();
+        return phone.length === 10;
       },
-    }).then((res) => res.json());
-  };
+      errorMessage: 'Введите корректный номер телефона!'
+    }
+    ]).onSuccess((e) => {
+      if (document.querySelector('#check').checked) {
+        const sendForm = (data) => {
+          return fetch('mail.php', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+              'Content-type': 'application/json; charset=UTF-8'
+            }
+          }).then(res => res.json());
+        };
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+        const dataForm = new FormData(e.target);
+        const user = {};
 
-    const dataForm = new FormData(form);
-    const user = {};
+        dataForm.forEach((val, key) => {
+          user[key] = val;
+        });
 
-    dataForm.forEach((val, key) => {
-      user[key] = val;
-    });
+        sendForm(user).then(data => {
+            //document.querySelector('.modal').style.display = 'block';
+            //body.classList.add('noscroll');
 
-    sendForm(user).then((data) => {
-      console.log("Письмо успешно отправлено!");
-    });
+            
+          alert("Данные успешно отправлены!")
+          //console.log("Письмо успешно отправлено!");
+        });
 
-    form.reset();
+        e.target.reset();
+     }
+
   });
-});
 
-//accordeon
+  //accordeon
 
-const accordeon = document.querySelector(".facts__items"),
-  tab = document.querySelectorAll(".facts__item"),
-  answer = document.querySelectorAll(".facts__answer"),
-  plus = document.querySelectorAll(".facts__plus"),
-  minus = document.querySelectorAll(".facts__minus"),
-  open = document.querySelectorAll(".facts__open--style");
+  const accordeon = document.querySelector(".facts__items"),
+    tab = document.querySelectorAll(".facts__item"),
+    answer = document.querySelectorAll(".facts__answer"),
+    plus = document.querySelectorAll(".facts__plus"),
+    minus = document.querySelectorAll(".facts__minus"),
+    open = document.querySelectorAll(".facts__open--style");
 
-accordeon.addEventListener("click", (e) => {
-  const target = e.target.closest(".facts__item");
+  accordeon.addEventListener("click", (e) => {
+    const target = e.target.closest(".facts__item");
 
-  if (target) {
-    tab.forEach((item, i) => {
-      if (
-        item === target &&
-        !target.classList.contains("facts__item--active")
-      ) {
-        answer[i].classList.add("active__answer");
-        tab[i].classList.add("facts__item--active");
-        plus[i].style.display = "none";
-        minus[i].style.display = "flex";
-        open[i].style.background = "#0074D4";
-      } else {
-        answer[i].classList.remove("active__answer");
-        tab[i].classList.remove("facts__item--active");
-        plus[i].style.display = "flex";
-        minus[i].style.display = "none";
-        open[i].style.background = "#37A5FF";
-      }
-    });
-  }
+    if (target) {
+      tab.forEach((item, i) => {
+        if (
+          item === target &&
+          !target.classList.contains("facts__item--active")
+        ) {
+          answer[i].classList.add("active__answer");
+          tab[i].classList.add("facts__item--active");
+          plus[i].style.display = "none";
+          minus[i].style.display = "flex";
+          open[i].style.background = "#0074D4";
+        } else {
+          answer[i].classList.remove("active__answer");
+          tab[i].classList.remove("facts__item--active");
+          plus[i].style.display = "flex";
+          minus[i].style.display = "none";
+          open[i].style.background = "#37A5FF";
+        }
+      });
+    }
+  });
 });
 
 // $(".facts__item").click(function (e) {
