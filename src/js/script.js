@@ -186,11 +186,19 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         sendForm(user).then(data => {
-            //document.querySelector('.modal').style.display = 'block';
-            //body.classList.add('noscroll');
+            document.querySelector('.modal-thank').style.display = 'block';
+            body.classList.add('noscroll');
 
-            
-          alert("Данные успешно отправлены!")
+            if (innerWidth > 768) {
+              body.style.paddingRight = innerWidth - clientWidth + 'px';//добавляем padding = ширине вертикального скролла
+            }else {
+              body.style.paddingRight = null;
+            }
+
+            if (innerWidth <= 768) {
+              body.style.paddingRight = null;
+            };
+          //alert("Спасибо! Наш менеджер свяжется с Вами в близжайшее время!")
           //console.log("Письмо успешно отправлено!");
         });
 
